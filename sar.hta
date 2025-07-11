@@ -1,0 +1,933 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>SAP Автоматизация</title>
+  <HTA:APPLICATION ID="SapAutoRun" APPLICATIONNAME="SAP Автоматизация" SCROLL="yes" SINGLEINSTANCE="yes"
+    WINDOWSTATE="normal" ICON="" VERSION="1.0" APPLICATION="yes" COMPATIBLE="yes" MSCOMPATIBLE="yes">
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        background-color: #f5f7fa;
+        color: #333;
+      }
+
+      h1 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+      }
+
+      h2 {
+        color: #2980b9;
+        margin-top: 0;
+      }
+
+      .container {
+        border: 1px solid #e0e6ed;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .container:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 35%;
+        left: 35%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        width: 500px;
+        max-width: 90%;
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        z-index: 999;
+      }
+
+      button {
+        margin: 5px;
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .compatibility {
+        padding: 15px;
+        margin-bottom: 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .compatible {
+        background-color: #d5f5e3;
+        color: #27ae60;
+        border: 1px solid #2ecc71;
+      }
+
+      .not-compatible {
+        background-color: #fadbd8;
+        color: #c0392b;
+        border: 1px solid #e74c3c;
+      }
+
+      #formContainer {
+        background-color: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 15px;
+        font-weight: 500;
+        color: #2c3e50;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      textarea:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      textarea {
+        height: 80px;
+        resize: vertical;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 5px;
+        transform: scale(1.2);
+      }
+
+      hr {
+        border: 0;
+        height: 1px;
+        background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.5), rgba(52, 152, 219, 0.1));
+        margin: 30px 0;
+      }
+
+      #saveButton {
+        background-color: #27ae60;
+        padding: 10px 20px;
+        font-weight: bold;
+      }
+
+      #saveButton:hover {
+        background-color: #219653;
+      }
+
+      #detailsModal button {
+        background-color: #7f8c8d;
+        margin-top: 20px;
+        width: 100px;
+      }
+
+      #detailsModal button:hover {
+        background-color: #636e72;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .button-group button {
+        flex: 1;
+      }
+
+      .delete-btn {
+        background-color: #e74c3c !important;
+      }
+
+      .delete-btn:hover {
+        background-color: #c0392b !important;
+      }
+
+      .view-btn {
+        background-color: #9b59b6 !important;
+      }
+
+      .view-btn:hover {
+        background-color: #8e44ad !important;
+      }
+
+      .edit-btn {
+        background-color: #f39c12 !important;
+      }
+
+      .edit-btn:hover {
+        background-color: #d35400 !important;
+      }
+
+      .modal h3 {
+        color: #2c3e50;
+        margin-top: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+
+      .modal p {
+        line-height: 1.6;
+        font-size: 16px;
+        color: #555;
+      }
+
+      #formContainer {
+        background-color: white;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .form-row {
+        width: 100%;
+        margin-bottom: 8px;
+        overflow: hidden;
+        /* Clear floats */
+      }
+
+      .form-group {
+        width: 47%;
+        float: left;
+        margin-right: 2%;
+        margin-bottom: 10px;
+      }
+
+      .form-group:nth-child(2n) {
+        margin-right: 0;
+        float: right;
+      }
+
+      .form-group-wide {
+        width: 98%;
+        clear: both;
+        margin-bottom: 10px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 13px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        width: 95%;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-family: inherit;
+        font-size: 13px;
+        box-sizing: border-box;
+      }
+
+      textarea {
+        height: 60px;
+        resize: vertical;
+        width: 98%;
+      }
+
+      .checkbox-container {
+        margin-top: 20px;
+      }
+
+      .checkbox-container label {
+        display: inline;
+        margin-left: 5px;
+        font-weight: normal;
+      }
+
+      .form-buttons {
+        margin-top: 10px;
+        text-align: right;
+        clear: both;
+      }
+
+      #scriptsModal {
+        width: 600px;
+        top: 35%;
+        left: 35%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+</head>
+
+<body>
+  <div id="compatibility" class="compatibility"></div>
+  <h1>Управление данными</h1>
+
+  <div id="formContainer">
+    <h2 id="formTitle">Добавить новый объект</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" id="name">
+      </div>
+
+      <div class="form-group">
+        <label>Код сервиса</label>
+        <input type="text" id="serviceCode">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Мандат (3 цифры)</label>
+        <input type="number" id="mandate" min="100" max="999">
+      </div>
+
+      <div class="form-group">
+        <label>Имя пользователя</label>
+        <input type="text" id="username">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="text" id="password">
+      </div>
+
+      <div class="form-group">
+        <div class="checkbox-container">
+          <input type="checkbox" id="autoLogin">
+          <label for="autoLogin">Автоматический вход</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group-wide">
+      <label>Описание</label>
+      <textarea id="description" rows="2"></textarea>
+    </div>
+
+    <div class="form-buttons">
+      <button id="saveButton" onclick="saveItem()">Сохранить</button>
+      <button onclick="clearForm()">Очистить</button>
+    </div>
+  </div>
+
+  <hr>
+  <div id="dataContainer"></div>
+
+  <div id="overlay" class="overlay"></div>
+  <div id="detailsModal" class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalDescription"></p>
+    <button onclick="closeModal()">Закрыть</button>
+  </div>
+
+  <div id="scriptsModal" class="modal">
+    <h3>Управление пользовательскими скриптами</h3>
+    <div>
+      <label>Выбор скрипта:</label>
+      <select id="scriptList" style="width:100%"></select>
+    </div>
+    <div>
+      <label>Название скрипта:</label>
+      <input type="text" id="scriptName" style="width:100%">
+    </div>
+    <div>
+      <label>Код скрипта:</label>
+      <textarea id="scriptContent" rows="10" style="width:100%"></textarea>
+    </div>
+    <div class="button-group">
+      <button onclick="saveCurrentScript()">Сохранить</button>
+      <button onclick="addNewScript()">Добавить</button>
+      <button onclick="runScriptWithoutSaving()">Запустить</button>
+      <button onclick="deleteCurrentScript()">Удалить</button>
+      <button onclick="closeScriptsModal()">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    // Код для авторизации в SAP
+    // Проверка совместимости
+    function checkCompatibility() {
+      var compatDiv = document.getElementById('compatibility');
+      try {
+        // Проверяем поддержку ActiveX
+        if (typeof ActiveXObject === 'undefined') {
+          throw new Error('ActiveX не поддерживается');
+        }
+
+        // Проверяем FileSystemObject
+        try {
+          new ActiveXObject("Scripting.FileSystemObject");
+        } catch (e) {
+          throw new Error('FileSystemObject не доступен');
+        }
+
+        compatDiv.innerHTML = "Приложение совместимо с вашей системой";
+        compatDiv.className = "compatibility compatible";
+        return true;
+
+      } catch (e) {
+        compatDiv.innerHTML = "Приложение не совместимо: " + e.message;
+        compatDiv.className = "compatibility not-compatible";
+        document.getElementById('saveButton').disabled = true;
+        return false;
+      }
+    }
+
+    // Функции для работы с файловым хранилищем (CSV формат)
+    function getDataFilePath() {
+      var path = window.location.pathname;
+      var dir = path.substring(0, path.lastIndexOf('\\') + 1);
+      return dir + "data.csv";
+    }
+
+    function loadData() {
+      var filePath = getDataFilePath();
+      var fso = new ActiveXObject("Scripting.FileSystemObject");
+      var data = [];
+
+      if (!fso.FileExists(filePath)) {
+        return data;
+      }
+
+      var file = fso.OpenTextFile(filePath, 1); // 1 = ForReading
+      while (!file.AtEndOfStream) {
+        var line = file.ReadLine();
+        var parts = line.split('|');
+        if (parts.length === 7) {
+          data.push({
+            name: parts[0],
+            description: parts[1],
+            serviceCode: parts[2],
+            mandate: parseInt(parts[3]),
+            username: parts[4],
+            password: parts[5],
+            autoLogin: parts[6] === "true"
+          });
+        }
+      }
+      file.Close();
+      return data;
+    }
+
+    function saveData(data) {
+      var filePath = getDataFilePath();
+      var fso = new ActiveXObject("Scripting.FileSystemObject");
+      var file = fso.OpenTextFile(filePath, 2, true); // 2 = ForWriting
+
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var line =
+          escapeCSV(item.name) + "|" +
+          escapeCSV(item.description) + "|" +
+          escapeCSV(item.serviceCode) + "|" +
+          item.mandate + "|" +
+          escapeCSV(item.username) + "|" +
+          escapeCSV(item.password) + "|" +
+          item.autoLogin;
+        file.WriteLine(line);
+      }
+      file.Close();
+    }
+
+    function escapeCSV(str) {
+      return String(str).replace(/\|/g, " ");
+    }
+
+    // Инициализация данных
+    var dataArray = loadData();
+    var editingIndex = -1;
+
+    // Отображение данных
+    function displayData() {
+      var container = document.getElementById('dataContainer');
+      container.innerHTML = '';
+
+      for (var i = 0; i < dataArray.length; i++) {
+        var item = dataArray[i];
+        var div = document.createElement('div');
+        div.className = 'container';
+        div.innerHTML =
+          '<strong>Название:</strong> ' + escapeHTML(item.name) + '<br>' +
+          '<strong>Описание:</strong> ' + escapeHTML(item.description) + '<br>' +
+          '<strong>Код сервиса:</strong> ' + escapeHTML(item.serviceCode) + '<br>' +
+          '<strong>Мандат:</strong> ' + item.mandate + '<br>' +
+          '<strong>Имя пользователя:</strong> ' + escapeHTML(item.username) + '<br>' +
+          '<strong>Пароль:</strong> ' + escapeHTML(item.password) + '<br>' +
+          '<strong>Автовход:</strong> ' + (item.autoLogin ? 'Да' : 'Нет') + '<br>' +
+          '<button onclick="editItem(' + i + ')">Редактировать</button>' +
+          '<button onclick="deleteItem(' + i + ')">Удалить</button>' +
+          '<button onclick="showDetails(' + i + ')">Запуск</button>' +
+          '<button onclick="showScriptsModal(' + i + ')"' +
+          (item.autoLogin ? '' : ' disabled') + '>Скрипты</button>';
+        container.appendChild(div);
+      }
+    }
+
+    // Функция безопасности для HTML
+    function escapeHTML(str) {
+      if (str == null) return '';
+      return str.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Сохранение элемента
+    function saveItem() {
+      var name = document.getElementById('name').value;
+      var description = document.getElementById('description').value;
+      var serviceCode = document.getElementById('serviceCode').value;
+      var mandate = parseInt(document.getElementById('mandate').value);
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+      var autoLogin = document.getElementById('autoLogin').checked;
+
+      // Валидация
+      var mandateStr = String(mandate);
+
+      // Проверяем длину и каждый символ
+      if (mandateStr.length !== 3) {
+        alert('Мандат должен быть трехзначным числом (100-999)');
+        return;
+      }
+
+      for (var i = 0; i < mandateStr.length; i++) {
+        var char = mandateStr.charAt(i);
+        if (char < '0' || char > '9') {
+          alert('Мандат должен быть трехзначным числом (100-999)');
+          return;
+        }
+      }
+
+      if (username == "") {
+        alert('Имя пользователя путое');
+        return;
+      }
+
+      if (password == "") {
+        alert('Пароль путой');
+        return;
+      }
+
+      if (serviceCode == "") {
+        alert('Код сервиса путой');
+        return;
+      }
+
+      var item = {
+        name: name,
+        description: description,
+        serviceCode: serviceCode,
+        mandate: mandate,
+        username: username,
+        password: password,
+        autoLogin: autoLogin
+      };
+
+      if (editingIndex === -1) {
+        dataArray.push(item);
+      } else {
+        dataArray[editingIndex] = item;
+        editingIndex = -1;
+        document.getElementById('saveButton').innerText = 'Сохранить';
+        document.getElementById('formTitle').innerText = 'Добавить новый объект';
+      }
+
+      saveData(dataArray);
+      displayData();
+      clearForm();
+    }
+
+    // Редактирование элемента
+    function editItem(index) {
+      var item = dataArray[index];
+      document.getElementById('name').value = item.name;
+      document.getElementById('description').value = item.description;
+      document.getElementById('serviceCode').value = item.serviceCode;
+      document.getElementById('mandate').value = item.mandate;
+      document.getElementById('username').value = item.username;
+      document.getElementById('password').value = item.password;
+      document.getElementById('autoLogin').checked = item.autoLogin;
+
+      editingIndex = index;
+      document.getElementById('saveButton').innerText = 'Обновить';
+      document.getElementById('formTitle').innerText = 'Редактирование объекта';
+    }
+
+    // Удаление элемента
+    function deleteItem(index) {
+      if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
+        dataArray.splice(index, 1);
+        saveData(dataArray);
+        displayData();
+      }
+    }
+
+    // Просмотр деталей
+    function showDetails(index) {
+      var item = dataArray[index];
+      document.getElementById('modalTitle').innerText = item.name;
+      document.getElementById('modalDescription').innerText = 'Процесс запущен, для возврат в меню нажмите "Закрыть"';
+      document.getElementById('detailsModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      auth(index);
+    }
+
+    function auth(index) {
+      try {
+        // Параметры подключения
+        var item = dataArray[index];
+        var system = item.serviceCode;
+        var client = item.mandate;
+        var user = item.username;
+        var password = item.password;
+
+        // Проверка доступности SAP GUI
+        if (typeof GetObject === "undefined") {
+          alert("Ошибка: Функция GetObject не поддерживается в этой среде");
+          return;
+        }
+
+        // Создание объектов SAP GUI
+        var SapGuiAuto;
+        try {
+          SapGuiAuto = GetObject("SAPGUI");
+        } catch (e) {
+          alert("SAP GUI не запущен или недоступен. Пожалуйста, запустите SAP Logon.");
+          return;
+        }
+
+        var application = SapGuiAuto.GetScriptingEngine();
+        var connection = application.OpenConnection(system, false);
+
+        // Получение сессии
+        var session = connection.Children(0);
+
+        // Ввод учетных данных
+        session.findById("wnd[0]").maximize();
+        session.findById("wnd[0]").maximize();
+        session.findById("wnd[0]/usr/txtRSYST-MANDT").text = "" + client + "";
+        session.findById("wnd[0]/usr/txtRSYST-BNAME").text = "" + user + "";
+        session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = "" + password + "";
+
+        if (autoLogin) {
+          session.findById("wnd[0]/tbar[0]/btn[0]").press();
+        }
+
+        // Успешное подключение
+        alert("Успешный вход в систему " + system + " под пользователем " + user);
+
+      } catch (e) {
+        alert("Ошибка при подключении к SAP: " + e.message);
+      }
+    }
+
+
+
+    // Закрытие модального окна
+    function closeModal() {
+      document.getElementById('detailsModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    // Очистка формы
+    function clearForm() {
+      document.getElementById('name').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('serviceCode').value = '';
+      document.getElementById('mandate').value = '';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('autoLogin').checked = false;
+      editingIndex = -1;
+      document.getElementById('saveButton').innerText = 'Сохранить';
+      document.getElementById('formTitle').innerText = 'Добавить новый объект';
+    }
+  </script>
+
+  <script>
+    // Глобальные переменные для управления скриптами
+    var currentScripts = [];
+    var currentDataIndex = -1;
+
+    // Функции для работы с файлом скриптов
+    function getScriptsFilePath() {
+      var path = window.location.pathname;
+      var dir = path.substring(0, path.lastIndexOf('\\') + 1);
+      return dir + "user_scripts.csv";
+    }
+
+    function loadScripts() {
+      var filePath = getScriptsFilePath();
+      var fso = new ActiveXObject("Scripting.FileSystemObject");
+      var scripts = [];
+
+      if (!fso.FileExists(filePath)) {
+        return scripts;
+      }
+
+      var file = fso.OpenTextFile(filePath, 1);
+      while (!file.AtEndOfStream) {
+        var line = file.ReadLine();
+        var pos = line.indexOf('|');
+        if (pos !== -1) {
+          var name = line.substring(0, pos);
+          var content = line.substring(pos + 1);
+          scripts.push({
+            name: name,
+            content: content
+          });
+        }
+      }
+      file.Close();
+      return scripts;
+    }
+
+    function saveScripts(scripts) {
+      var filePath = getScriptsFilePath();
+      var fso = new ActiveXObject("Scripting.FileSystemObject");
+      var file = fso.OpenTextFile(filePath, 2, true);
+
+      for (var i = 0; i < scripts.length; i++) {
+        var script = scripts[i];
+        var safeName = script.name.replace(/\|/g, ' ');
+        file.WriteLine(safeName + "|" + script.content);
+      }
+      file.Close();
+    }
+
+    // Функции управления скриптами
+    function showScriptsModal(index) {
+      var item = dataArray[index];
+      if (!item.autoLogin) {
+        alert("Окно скриптов доступно только при включенном Автовходе");
+        return;
+      }
+
+      currentDataIndex = index;
+      currentScripts = loadScripts();
+
+      // Заполняем список скриптов
+      var scriptList = document.getElementById('scriptList');
+      scriptList.innerHTML = '';
+      for (var i = 0; i < currentScripts.length; i++) {
+        var option = new Option(currentScripts[i].name, i);
+        scriptList.options.add(option);
+      }
+
+      // Очищаем поля
+      document.getElementById('scriptName').value = '';
+      document.getElementById('scriptContent').value = '';
+
+      // Автоматически выбираем первый скрипт, если он есть
+      if (scriptList.options.length > 0) {
+        scriptList.selectedIndex = 0;
+        loadSelectedScript();
+      }
+
+      // Показываем окно
+      document.getElementById('scriptsModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeScriptsModal() {
+      document.getElementById('scriptsModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    function loadSelectedScript() {
+      var scriptList = document.getElementById('scriptList');
+      var selectedIndex = scriptList.selectedIndex;
+
+      if (selectedIndex >= 0 && selectedIndex < currentScripts.length) {
+        var script = currentScripts[selectedIndex];
+        document.getElementById('scriptName').value = script.name;
+        document.getElementById('scriptContent').value = script.content;
+      }
+    }
+
+    function addNewScript() {
+      var scriptList = document.getElementById('scriptList');
+      scriptList.selectedIndex = -1;
+      document.getElementById('scriptName').value = '';
+      document.getElementById('scriptContent').value = '';
+    }
+
+    function saveCurrentScript() {
+      var name = document.getElementById('scriptName').value;
+      var content = document.getElementById('scriptContent').value;
+
+      if (!name) {
+        alert("Введите название скрипта");
+        return;
+      }
+
+      // Удаляем старую версию если редактируем
+      var newScripts = [];
+      for (var i = 0; i < currentScripts.length; i++) {
+        if (currentScripts[i].name !== name) {
+          newScripts.push(currentScripts[i]);
+        }
+      }
+      currentScripts = newScripts;
+
+      // Добавляем новый скрипт
+      currentScripts.push({
+        name: name,
+        content: content
+      });
+
+      saveScripts(currentScripts);
+      alert("Скрипт сохранен!");
+      showScriptsModal(currentDataIndex);
+    }
+
+    function runScriptWithoutSaving() {
+      var content = document.getElementById('scriptContent').value;
+      if (!content) {
+        alert("Скрипт пуст!");
+        return;
+      }
+
+      if (currentDataIndex === -1) {
+        alert("Пользователь не выбран");
+        return;
+      }
+
+      var sapCode = getRunCode(currentDataIndex);
+      var fullScript = sapCode + "\n" + content;
+
+      try {
+        var scriptFunction = new Function(fullScript);
+        scriptFunction();
+        alert("Скрипт выполнен успешно!");
+      } catch (e) {
+        alert("Ошибка выполнения: " + e.message);
+      }
+    }
+
+    function getRunCode(index) {
+      var item = dataArray[index];
+      return 'try {' +
+        'var SapGuiAuto = GetObject("SAPGUI");' +
+        'var application = SapGuiAuto.GetScriptingEngine();' +
+        'var connection = application.OpenConnection("' + item.serviceCode + '", false);' +
+        'var session = connection.Children(0);' +
+        'session.findById("wnd[0]").maximize();' +
+        'session.findById("wnd[0]/usr/txtRSYST-MANDT").text = "' + item.mandate + '";' +
+        'session.findById("wnd[0]/usr/txtRSYST-BNAME").text = "' + item.username + '";' +
+        'session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = "' + item.password + '";' +
+        'session.findById("wnd[0]/tbar[0]/btn[0]").press();' +
+        '} catch(e) {' +
+        'alert("SAP initialization failed: " + e.message);' +
+        '}';
+    }
+
+    function deleteCurrentScript() {
+      var scriptList = document.getElementById('scriptList');
+      var selectedIndex = scriptList.selectedIndex;
+
+      if (selectedIndex < 0) {
+        alert("Скрипт не выбран");
+        return;
+      }
+
+      var scriptName = currentScripts[selectedIndex].name;
+      if (!confirm("Удалить скрипт '" + scriptName + "'?")) return;
+
+      var newScripts = [];
+      for (var i = 0; i < currentScripts.length; i++) {
+        if (currentScripts[i].name !== scriptName) {
+          newScripts.push(currentScripts[i]);
+        }
+      }
+      currentScripts = newScripts;
+
+      saveScripts(currentScripts);
+      showScriptsModal(currentDataIndex);
+    }
+  </script>
+
+  <script>
+    // Инициализация приложения
+    window.onload = function () {
+      checkCompatibility();
+      displayData();
+      document.getElementById('overlay').onclick = function () {
+        closeModal();
+        closeScriptsModal();
+      };
+      // Инициализация обработчика для списка скриптов
+      document.getElementById('scriptList').onchange = loadSelectedScript;
+    };
+
+  </script>
+
+</body>
+
+</html>
