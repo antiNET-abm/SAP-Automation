@@ -2,7 +2,8 @@
 
 ### Предупреждение
 Этот скрипт предоставляется «как есть» без какой-либо гарантии. Используйте на свой страх и риск.  
-###Disclaimer
+
+### Disclaimer
 This script is provided as-is and without any warranty. Use at your own risk.
 
 ---
@@ -71,12 +72,12 @@ Inspired by [SAPLOGON_VBS](https://github.com/AkshayNalange/SAPLOGON_VBS ), this
 
 ---
 
-###Требования
+### Требования
 - **Windows** (только для HTA и ActiveX).  
 - **SAP GUI для Windows** с включённым Scripting Engine.  
 - **Включить ActiveX** в настройках безопасности. 
 
-###Requirements
+### Requirements
 - **Windows** (HTA and ActiveX only).  
 - **SAP GUI for Windows** with enabled Scripting Engine.  
 - **ActiveX enabled** in security settings.  
