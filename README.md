@@ -96,7 +96,8 @@ Inspired by [SAPLOGON_VBS](https://github.com/AkshayNalange/SAPLOGON_VBS ), this
 
 ### Участие в проекте
 Если вы обнаружили ошибки или хотите предложить улучшения, откройте issue или отправьте pull request.  
-###Contributing  
+
+### Contributing  
 If you find any issues or have suggestions for improvement, feel free to open an issue or submit a pull request.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)  ![Sap logon - Windows 10](https://img.shields.io/badge/Sap%20Logon%20730-brightgreen)  ![Windows 10](https://img.shields.io/badge/Windows%2010-blue)
